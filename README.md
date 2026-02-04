@@ -1,4 +1,4 @@
-# 🏪 BarberShop Manager - Sistema Multi-Barbearia
+# 🏪 RéguaPro - Sistema de Gestão para Barbearias
 
 Sistema completo de gerenciamento para barbearias com suporte a múltiplas empresas e planos de assinatura.
 

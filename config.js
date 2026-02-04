@@ -48,6 +48,12 @@ async function loadBarbeariaData() {
         // Preencher informações do plano
         displayPlanInfo(barbearia);
         
+        // Exibir email atual
+        const currentEmailEl = document.getElementById('currentEmail');
+        if (currentEmailEl && currentUser.email) {
+            currentEmailEl.textContent = currentUser.email;
+        }
+        
         // Atualizar header com nome da barbearia
         const headerNome = document.getElementById('headerNome');
         if (headerNome && barbearia.nome) {
@@ -150,6 +156,18 @@ function setupEventListeners() {
     // Submissão do formulário
     const configForm = document.getElementById('configForm');
     configForm.addEventListener('submit', handleConfigSubmit);
+
+    // Formulário de alteração de email
+    const changeEmailForm = document.getElementById('changeEmailForm');
+    if (changeEmailForm) {
+        changeEmailForm.addEventListener('submit', handleChangeEmail);
+    }
+
+    // Formulário de alteração de senha
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', handleChangePassword);
+    }
 }
 
 // ============================================
@@ -292,5 +310,153 @@ async function handleConfigSubmit(e) {
         const submitBtn = e.target.querySelector('button[type="submit"]');
         submitBtn.disabled = false;
         submitBtn.textContent = 'Salvar Configurações';
+    }
+}
+
+// ============================================
+// ALTERAR EMAIL
+// ============================================
+
+async function handleChangeEmail(e) {
+    e.preventDefault();
+    
+    const newEmail = document.getElementById('newEmail').value.trim();
+    const password = document.getElementById('passwordForEmail').value;
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    
+    if (!newEmail || !password) {
+        alert('Por favor, preencha todos os campos.');
+        return;
+    }
+
+    // Verificar se o email é diferente do atual
+    if (newEmail === currentUser.email) {
+        alert('O novo e-mail deve ser diferente do atual.');
+        return;
+    }
+
+    try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Alterando...';
+
+        // Reautenticar usuário antes de alterar email
+        const credential = firebase.auth.EmailAuthProvider.credential(
+            currentUser.email,
+            password
+        );
+
+        await currentUser.reauthenticateWithCredential(credential);
+        
+        // Atualizar email
+        await currentUser.updateEmail(newEmail);
+
+        // Atualizar email na coleção barbearias
+        await db.collection('barbearias').doc(currentUser.uid).update({
+            email: newEmail,
+            dataAtualizacao: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert('✅ E-mail alterado com sucesso!\n\nVocê será redirecionado para fazer login novamente.');
+        
+        // Fazer logout e redirecionar para login
+        await auth.signOut();
+        window.location.href = 'login.html';
+
+    } catch (error) {
+        console.error('❌ Erro ao alterar e-mail:', error);
+        
+        let errorMessage = 'Erro ao alterar e-mail.';
+        
+        if (error.code === 'auth/wrong-password') {
+            errorMessage = 'Senha incorreta.';
+        } else if (error.code === 'auth/email-already-in-use') {
+            errorMessage = 'Este e-mail já está em uso.';
+        } else if (error.code === 'auth/invalid-email') {
+            errorMessage = 'E-mail inválido.';
+        } else if (error.code === 'auth/requires-recent-login') {
+            errorMessage = 'Por segurança, faça login novamente antes de alterar o e-mail.';
+        }
+        
+        alert('❌ ' + errorMessage);
+        
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Alterar E-mail';
+    }
+}
+
+// ============================================
+// ALTERAR SENHA
+// ============================================
+
+async function handleChangePassword(e) {
+    e.preventDefault();
+    
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        alert('Por favor, preencha todos os campos.');
+        return;
+    }
+
+    // Validar comprimento da senha
+    if (newPassword.length < 6) {
+        alert('A nova senha deve ter pelo menos 6 caracteres.');
+        return;
+    }
+
+    // Verificar se as senhas coincidem
+    if (newPassword !== confirmPassword) {
+        alert('As senhas não coincidem.');
+        return;
+    }
+
+    // Verificar se a nova senha é diferente da atual
+    if (currentPassword === newPassword) {
+        alert('A nova senha deve ser diferente da senha atual.');
+        return;
+    }
+
+    try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Alterando...';
+
+        // Reautenticar usuário antes de alterar senha
+        const credential = firebase.auth.EmailAuthProvider.credential(
+            currentUser.email,
+            currentPassword
+        );
+
+        await currentUser.reauthenticateWithCredential(credential);
+        
+        // Atualizar senha
+        await currentUser.updatePassword(newPassword);
+
+        alert('✅ Senha alterada com sucesso!');
+        
+        // Limpar campos
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+
+    } catch (error) {
+        console.error('❌ Erro ao alterar senha:', error);
+        
+        let errorMessage = 'Erro ao alterar senha.';
+        
+        if (error.code === 'auth/wrong-password') {
+            errorMessage = 'Senha atual incorreta.';
+        } else if (error.code === 'auth/weak-password') {
+            errorMessage = 'A senha é muito fraca. Use pelo menos 6 caracteres.';
+        } else if (error.code === 'auth/requires-recent-login') {
+            errorMessage = 'Por segurança, faça login novamente antes de alterar a senha.';
+        }
+        
+        alert('❌ ' + errorMessage);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Alterar Senha';
     }
 }

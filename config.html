@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configurar Barbearia - BarberShop Manager</title>
+    <title>Configurar Barbearia - RéguaPro</title>
+    <link rel="icon" type="image/png" href="Assets/LogoReguaPro.png">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="auth-styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -123,6 +124,55 @@
 
                 <button type="submit" class="btn-primary">Salvar Configurações</button>
             </form>
+
+            <!-- Seção de Segurança -->
+            <div class="security-section" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--color-accent);">
+                <div class="section-header">
+                    <span class="section-badge">🔒 Segurança</span>
+                    <h3 style="color: var(--color-white); font-size: 1.3rem; margin: 1rem 0 0.5rem 0;">Segurança da Conta</h3>
+                    <p style="color: var(--color-accent); margin-bottom: 2rem;">Mantenha suas credenciais de acesso atualizadas</p>
+                </div>
+
+                <!-- Alterar Email -->
+                <div class="security-card" style="background: rgba(255, 140, 0, 0.05); padding: 1.5rem; border-radius: var(--border-radius); border: 1px solid rgba(255, 140, 0, 0.2); margin-bottom: 1.5rem;">
+                    <h4 style="color: var(--color-white); margin-bottom: 0.5rem;">Alterar E-mail</h4>
+                    <p style="color: var(--color-accent); font-size: 0.9rem; margin-bottom: 1rem;">E-mail atual: <span id="currentEmail" style="color: var(--color-light-silver); font-weight: 600;">carregando...</span></p>
+                    
+                    <form id="changeEmailForm">
+                        <div class="form-group">
+                            <label for="newEmail">Novo E-mail</label>
+                            <input type="email" id="newEmail" required placeholder="seuemail@exemplo.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="passwordForEmail">Senha Atual (para confirmar)</label>
+                            <input type="password" id="passwordForEmail" required placeholder="Digite sua senha atual">
+                        </div>
+                        <button type="submit" class="btn-secondary">Alterar E-mail</button>
+                    </form>
+                </div>
+
+                <!-- Alterar Senha -->
+                <div class="security-card" style="background: rgba(255, 140, 0, 0.05); padding: 1.5rem; border-radius: var(--border-radius); border: 1px solid rgba(255, 140, 0, 0.2);">
+                    <h4 style="color: var(--color-white); margin-bottom: 0.5rem;">Alterar Senha</h4>
+                    <p style="color: var(--color-accent); font-size: 0.9rem; margin-bottom: 1rem;">Mantenha sua senha segura e atualizada</p>
+                    
+                    <form id="changePasswordForm">
+                        <div class="form-group">
+                            <label for="currentPassword">Senha Atual</label>
+                            <input type="password" id="currentPassword" required placeholder="Digite sua senha atual">
+                        </div>
+                        <div class="form-group">
+                            <label for="newPassword">Nova Senha</label>
+                            <input type="password" id="newPassword" required placeholder="Digite a nova senha (mín. 6 caracteres)">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirmar Nova Senha</label>
+                            <input type="password" id="confirmPassword" required placeholder="Confirme a nova senha">
+                        </div>
+                        <button type="submit" class="btn-secondary">Alterar Senha</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
